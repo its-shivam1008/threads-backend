@@ -13,8 +13,18 @@ async function init() {
     app.use(cors());
 
     const server = new ApolloServer({
-        typeDefs:``,
-        resolvers:{}
+        typeDefs:`
+            type Query {
+                hello: String
+                say(name: String): String
+            }
+        `,
+        resolvers:{
+            Query:{
+                hello: () => "hey there from graphql server",
+                say: (_, {name}: {name:String}) => `Hey ${name}, how are you`,
+            }
+        }
     })
 
     await server.start();
