@@ -8,23 +8,24 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.resolvers = void 0;
-const db_1 = require("../../lib/db");
+const user_1 = __importDefault(require("../../services/user"));
 const queries = {
     hello: () => "hey there from graphql server",
     say: (_, { name }) => `Hey ${name}, how are you`,
+    getUserToken: (_, payload) => __awaiter(void 0, void 0, void 0, function* () {
+        const token = yield user_1.default.getUserToken({ email: payload.email, password: payload.password });
+        return token;
+    })
 };
 const mutations = {
-    createUser: (_1, _a) => __awaiter(void 0, [_1, _a], void 0, function* (_, { firstName, lastName, email, password }) {
-        yield db_1.prismaClient.user.create({ data: {
-                firstName,
-                lastName,
-                email,
-                password,
-                salt: "random"
-            } });
-        return true;
+    createUser: (_, payload) => __awaiter(void 0, void 0, void 0, function* () {
+        const res = yield user_1.default.createUser(payload);
+        return res.id;
     })
 };
 exports.resolvers = { queries, mutations };
