@@ -1,3 +1,10 @@
 export const typeDefs = ` #graphql
-    type Query
+
+    type User { 
+        id:ID!
+        firstName: String!
+        lastName:String
+        email:String!
+        profileImageUrl: String
+    }
 `

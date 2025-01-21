@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
 const graphql_1 = __importDefault(require("./graphql"));
+const user_1 = __importDefault(require("./services/user"));
 // import {expressMiddleware} from "@apollo/server/express4"
 const app = (0, express_1.default)();
 // const {ApolloServer} = require("@apollo/server");
@@ -26,7 +27,19 @@ function init() {
         app.use(bodyParser.json());
         app.use(cors());
         const server = yield (0, graphql_1.default)();
-        app.use("/graphql", expressMiddleware(server));
+        app.use("/graphql", expressMiddleware(server, {
+            // @ts-ignore
+            context: (_a) => __awaiter(this, [_a], void 0, function* ({ req }) {
+                const token = req.headers['token'];
+                try {
+                    const user = yield user_1.default.decodeJwtToken(token);
+                    return { user };
+                }
+                catch (error) {
+                    return {};
+                }
+            })
+        }));
         app.get('/', (req, res) => {
             res.json({ message: "hey what yo doing" });
         });

@@ -22,6 +22,10 @@ export default class UserService {
         return hashedPassword;
     }
 
+    public static getUserById(id:any){
+        return prismaClient.user.findUnique({where:{id}})
+    }
+
     public static createUser(payload:CreateUserPayload){
         const {firstName, lastName, email, password} = payload;
         const salt = randomBytes(32).toString('hex');
@@ -46,5 +50,10 @@ export default class UserService {
 
         const token = JWT.sign({id: user.id, name: user.lastName, email: user.email}, JWT_SECRET)
         return token;
+    }
+
+    public static async decodeJwtToken(token: string){
+        const res = JWT.verify(token, JWT_SECRET);
+        return res;
     }
 }

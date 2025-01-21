@@ -2,6 +2,7 @@ import express from "express";
 import { ApolloServer } from "@apollo/server";
 import { prismaClient } from "./lib/db";
 import createGraphqlServer from "./graphql";
+import UserService from "./services/user";
 // import {expressMiddleware} from "@apollo/server/express4"
 const app = express();
 // const {ApolloServer} = require("@apollo/server");
@@ -15,7 +16,18 @@ async function init() {
     app.use(cors());
 
     const server = await createGraphqlServer();
-    app.use("/graphql", expressMiddleware(server));
+    app.use("/graphql", expressMiddleware(server, {
+        // @ts-ignore
+        context: async ({req}) => {
+            const token = req.headers['token']
+            try {
+                const user = await UserService.decodeJwtToken(token as string) ;
+                return {user};
+            } catch (error) {
+                return {};
+            }
+        }
+    }));
 
 
     app.get('/', (req, res)=>{

@@ -21,6 +21,9 @@ class UserService {
         const hashedPassword = (0, node_crypto_1.createHmac)('sha256', salt).update(password).digest('hex');
         return hashedPassword;
     }
+    static getUserById(id) {
+        return db_1.prismaClient.user.findUnique({ where: { id } });
+    }
     static createUser(payload) {
         const { firstName, lastName, email, password } = payload;
         const salt = (0, node_crypto_1.randomBytes)(32).toString('hex');
@@ -44,6 +47,12 @@ class UserService {
                 throw new Error('Incorrect password');
             const token = jsonwebtoken_1.default.sign({ id: user.id, name: user.lastName, email: user.email }, JWT_SECRET);
             return token;
+        });
+    }
+    static decodeJwtToken(token) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const res = jsonwebtoken_1.default.verify(token, JWT_SECRET);
+            return res;
         });
     }
 }
